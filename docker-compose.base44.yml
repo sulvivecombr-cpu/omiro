@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  app:
+    image: golang:1.23
+    working_dir: /src
+    restart: on-failure
+    volumes:
+      - .:/src
+      - gomod:/go/pkg/mod
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports: ["3000:8080"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["sh","-ec","go install github.com/air-verse/air@v1.61.7 && exec air --build.cmd 'go build -o /tmp/omiro .' --build.bin /tmp/omiro --build.include_ext go,html --build.poll true"]
+    healthcheck:
+      test: ["CMD-SHELL","curl -fsS -o /dev/null http://localhost:8080/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+volumes:
+  gomod:

@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"os"
+	"strings"
 	"log"
 	"net/http"
 	"omiro/helper"
@@ -20,7 +22,7 @@ func EnsureUpgradeChecks(w http.ResponseWriter, r *http.Request) bool {
 
 	origin := r.Header.Get("Origin")
 	// TODO: Add allowed origins
-	if origin != "http://localhost:8080" && origin != "https://omiro.underthedesk.blog" {
+	if !originAllowed(origin) {
 		http.Error(w, "Forbidden origin", http.StatusForbidden)
 		return false
 	}
@@ -44,4 +46,16 @@ func EnsureUpgradeChecks(w http.ResponseWriter, r *http.Request) bool {
 	}
 	log.Printf("Token verified")
 	return true
+}
+
+func originAllowed(origin string) bool {
+	if origin == "http://localhost:8080" || origin == "https://omiro.underthedesk.blog" {
+		return true
+	}
+	for _, o := range strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",") {
+		if o = strings.TrimSpace(o); o != "" && o == origin {
+			return true
+		}
+	}
+	return false
 }

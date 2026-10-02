@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -25,11 +24,10 @@ func handleChat(c *Client, data json.RawMessage) {
 	}
 
 	log.Printf("[%s] says: %s\n", c.ID, payload.Message)
+	out, _ := json.Marshal(map[string]string{"op": "chat", "message": payload.Message})
 	partner.Send <- SendMessageType{
-		Message: fmt.Appendf(nil,
-			`{"op":"chat","message":"%s"}`, payload.Message,
-		),
-		Type: websocket.TextMessage,
+		Message: out,
+		Type:    websocket.TextMessage,
 	}
 
 }

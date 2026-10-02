@@ -21,15 +21,15 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("upgrade error:", err)
+		return
+	}
 	conn.SetReadDeadline(time.Now().Add(60 * time.Second))
 	conn.SetPongHandler(func(string) error {
 		conn.SetReadDeadline(time.Now().Add(60 * time.Second))
 		return nil
 	})
-	if err != nil {
-		log.Println("upgrade error:", err)
-		return
-	}
 	defer conn.Close()
 	log.Println("client connected:", conn.RemoteAddr())
 

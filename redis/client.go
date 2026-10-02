@@ -53,3 +53,7 @@ func Ping() error {
 	_, err := Client.Ping(Ctx).Result()
 	return err
 }
+
+func DeleteClient(clientID string) {
+	Client.Del(Ctx, "client:"+clientID)
+}

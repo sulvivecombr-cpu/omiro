@@ -13,92 +13,78 @@ var queue []string
 var queueMu sync.Mutex
 
 func handleJoinQueue(c *Client) {
+	// Never queue a client that still has a partner.
+	releasePartner(c)
+
 	queueMu.Lock()
 	defer queueMu.Unlock()
 
 	if slices.Contains(queue, c.ID) {
-		log.Println("client already in queue:", c.ID)
 		return
 	}
 	queue = append(queue, c.ID)
 	log.Println("added to queue:", c.ID)
-	findMatch(c)
+	findMatch()
+}
+
+func removeFromQueue(id string) {
+	queueMu.Lock()
+	defer queueMu.Unlock()
+	if i := slices.Index(queue, id); i >= 0 {
+		queue = slices.Delete(queue, i, i+1)
+		log.Println("removed from queue:", id)
+	}
+}
+
+// releasePartner breaks the pairing (if any) and notifies the partner.
+func releasePartner(c *Client) {
+	clientsMu.Lock()
+	partner := c.Partner
+	c.Partner = nil
+	if partner != nil && partner.Partner == c {
+		partner.Partner = nil
+	}
+	clientsMu.Unlock()
+
+	if partner != nil {
+		partner.trySend(websocket.TextMessage, []byte(`{"op":"partner_disconnected"}`))
+	}
 }
 
 func handleLeaveQueue(c *Client) {
-	queueMu.Lock()
-	for i, id := range queue {
-		if id == c.ID {
-			queue = append(queue[:i], queue[i+1:]...)
-			log.Println("removed from queue:", c.ID)
-			break
-		}
-	}
-	queueMu.Unlock()
-	if c.Partner != nil {
-		partner := c.Partner
-		c.Partner = nil
-		partner.Partner = nil
-
-		log.Printf("notifying partner %s about disconnection of %s\n", partner.ID, c.ID)
-		msg := []byte(`{"op":"partner_disconnected"}`)
-		select {
-		case partner.Send <- SendMessageType{
-			Message: msg,
-			Type:    websocket.TextMessage,
-		}:
-			log.Printf("successfully notified partner %s\n", partner.ID)
-		default:
-			log.Printf("failed to notify partner %s (channel full or closed)\n", partner.ID)
-		}
-	}
+	removeFromQueue(c.ID)
+	releasePartner(c)
 }
 
-func findMatch(c *Client) {
-	log.Println("finding match for:", c.ID)
-	log.Printf("queue length: %d\n", len(queue))
-	if len(queue) < 2 {
-		log.Println("not enough clients in queue to find match")
+// findMatch must be called with queueMu held.
+func findMatch() {
+	for len(queue) >= 2 {
+		clientsMu.RLock()
+		c1, c2 := clients[queue[0]], clients[queue[1]]
+		clientsMu.RUnlock()
+
+		// Drop stale (disconnected) entries but keep live ones queued.
+		if c1 == nil {
+			queue = queue[1:]
+			continue
+		}
+		if c2 == nil {
+			queue = append(queue[:1], queue[2:]...)
+			continue
+		}
+		queue = queue[2:]
+
+		clientsMu.Lock()
+		c1.Partner = c2
+		c2.Partner = c1
+		clientsMu.Unlock()
+
+		log.Println("matched:", c1.ID, "<->", c2.ID)
+		// c1 is the caller, c2 waits for the offer.
+		c1.trySend(websocket.TextMessage, fmt.Appendf(nil,
+			`{"op":"match_found","partner":"%s","should_call":true}`, c2.ID))
+		c2.trySend(websocket.TextMessage, fmt.Appendf(nil,
+			`{"op":"match_found","partner":"%s","should_call":false}`, c1.ID))
 		return
 	}
-
-	id1 := queue[0]
-	id2 := queue[1]
-	log.Printf("found match: %s <-> %s\n", id1, id2)
-	queue = queue[2:]
-	log.Printf("queue length after match: %d\n", len(queue))
-
-	clientsMu.RLock()
-	c1 := clients[id1]
-	c2 := clients[id2]
-	clientsMu.RUnlock()
-
-	if c1 == nil || c2 == nil {
-		log.Println("client not found:", id1, id2)
-		return
-	}
-	c1.Partner = c2
-	c2.Partner = c1
-
-	log.Println("matched:", id1, "<->", id2)
-
-	// Client 1 (first in queue) will be the caller
-	matchMsg1 := SendMessageType{
-		Type: websocket.TextMessage,
-		Message: fmt.Appendf(nil,
-			`{"op":"match_found","partner":"%s","should_call":true}`, id2,
-		),
-	}
-	c1.Send <- matchMsg1
-
-	// Client 2 will be the callee (waits for offer)
-	matchMsg2 := SendMessageType{
-		Type: websocket.TextMessage,
-		Message: fmt.Appendf(nil,
-			`{"op":"match_found","partner":"%s","should_call":false}`, id1,
-		),
-	}
-	c2.Send <- matchMsg2
-
-	log.Printf("Client %s is CALLER, Client %s is CALLEE\n", id1, id2)
 }

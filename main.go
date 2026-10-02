@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"omiro/middleware"
 	"omiro/redis"
@@ -40,11 +41,13 @@ func main() {
 	if pass == "" {
 		pass = ""
 	}
-	redis.Init(redis.Config{
+	if err := redis.Init(redis.Config{
 		Host:     host,
 		Port:     port,
 		Password: pass,
-	})
+	}); err != nil {
+		log.Fatal(err)
+	}
 	redis.RegisterServer(serverID)
 	redis.StartSignalSubscriber(serverID, deliverToClient)
 	e := echo.New()
@@ -64,7 +67,11 @@ func main() {
 		return c.File("index.html")
 	})
 	go redis.StartMatchmaker()
-	e.Start(":8080")
+	listen := os.Getenv("PORT")
+	if listen == "" {
+		listen = "8080"
+	}
+	e.Logger.Fatal(e.Start(":" + listen))
 }
 
 func deliverToClient(userID string, payload json.RawMessage) {
@@ -76,8 +83,5 @@ func deliverToClient(userID string, payload json.RawMessage) {
 		return
 	}
 
-	client.Send <- SendMessageType{
-		Type:    websocket.TextMessage,
-		Message: payload,
-	}
+	client.trySend(websocket.TextMessage, payload)
 }

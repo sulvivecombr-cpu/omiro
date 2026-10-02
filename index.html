@@ -1,585 +1,663 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Omiro - Random Video Chat</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0b0d17" />
+    <meta
+      name="description"
+      content="Papeo: conversas aleatórias por vídeo, áudio e texto com pessoas do mundo todo."
+    />
+    <title>Papeo — Papo aleatório por vídeo</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237c5cff'/%3E%3Cpath d='M16 22a6 6 0 0 1 6-6h14a6 6 0 0 1 6 6v4l10-6v24l-10-6v4a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6z' fill='white'/%3E%3C/svg%3E"
+    />
     <style>
+      :root {
+        --bg: #0b0d17;
+        --surface: #141829;
+        --surface-2: #1c2138;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #eef0ff;
+        --muted: #8e94b8;
+        --brand: #7c5cff;
+        --brand-2: #ff6bb5;
+        --ok: #2fd18b;
+        --warn: #ffb84d;
+        --danger: #ff5c72;
+        --radius: 16px;
+      }
+
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
-      @keyframes gradient {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-      }
-
-      @keyframes shimmer {
-        0% {
-          background-position: -1000px 0;
-        }
-        100% {
-          background-position: 1000px 0;
-        }
+      html {
+        -webkit-text-size-adjust: 100%;
       }
 
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0f3460);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 15px;
-      }
-
-      .container {
-        background: rgba(26, 26, 46, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5),
-          0 0 0 1px rgba(255, 255, 255, 0.05);
-        max-width: 1400px;
-        width: 100%;
-        overflow: hidden;
-        animation: fadeIn 0.5s ease;
-      }
-
-      .header {
-        background: linear-gradient(
-          135deg,
-          #667eea 0%,
-          #764ba2 50%,
-          #f093fb 100%
-        );
-        background-size: 200% 200%;
-        animation: gradient 3s ease infinite;
-        color: white;
-        padding: 30px 20px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .header::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+          sans-serif;
         background: radial-gradient(
-          circle,
-          rgba(255, 255, 255, 0.1) 0%,
-          transparent 70%
-        );
-        animation: pulse 3s ease-in-out infinite;
+            1200px 600px at 10% -10%,
+            rgba(124, 92, 255, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            900px 500px at 100% 0%,
+            rgba(255, 107, 181, 0.12),
+            transparent 60%
+          ),
+          var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right)
+          env(safe-area-inset-bottom) env(safe-area-inset-left);
+        line-height: 1.45;
       }
 
-      .header h1 {
-        font-size: clamp(2em, 5vw, 3em);
-        margin-bottom: 8px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      .app {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 16px 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 100vh;
+        min-height: 100dvh;
       }
 
-      .header p {
-        font-size: clamp(0.9em, 2vw, 1.1em);
-        opacity: 0.9;
-        position: relative;
-        z-index: 1;
+      /* ---------- Header ---------- */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-2));
+        display: grid;
+        place-items: center;
+        box-shadow: 0 8px 24px rgba(124, 92, 255, 0.35);
+        flex-shrink: 0;
+      }
+
+      .logo svg {
+        width: 22px;
+        height: 22px;
+        fill: #fff;
+      }
+
+      .brand h1 {
+        font-size: 1.35rem;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .brand p {
+        font-size: 0.8rem;
+        color: var(--muted);
       }
 
       .status {
-        padding: 16px;
-        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        font-size: 0.85rem;
         font-weight: 600;
-        font-size: clamp(0.95em, 2vw, 1.05em);
-        background: rgba(40, 40, 60, 0.8);
-        color: #a0a0c0;
-        transition: all 0.3s ease;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        max-width: 55%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--muted);
+        flex-shrink: 0;
       }
 
       .status.connected {
-        background: linear-gradient(
-          90deg,
-          rgba(52, 211, 153, 0.2),
-          rgba(16, 185, 129, 0.2)
-        );
-        color: #34d399;
-        animation: shimmer 3s linear infinite;
+        color: var(--ok);
       }
-
+      .status.connected::before {
+        background: var(--ok);
+      }
       .status.matching {
-        background: linear-gradient(
-          90deg,
-          rgba(251, 191, 36, 0.2),
-          rgba(245, 158, 11, 0.2)
-        );
-        color: #fbbf24;
-        animation: pulse 1.5s ease-in-out infinite;
+        color: var(--warn);
       }
-
+      .status.matching::before {
+        background: var(--warn);
+        animation: blink 1s ease-in-out infinite;
+      }
       .status.matched {
-        background: linear-gradient(
-          90deg,
-          rgba(96, 165, 250, 0.2),
-          rgba(59, 130, 246, 0.2)
-        );
-        color: #60a5fa;
-        animation: shimmer 2s linear infinite;
+        color: var(--brand);
+      }
+      .status.matched::before {
+        background: var(--brand);
+      }
+      .status.error {
+        color: var(--danger);
+      }
+      .status.error::before {
+        background: var(--danger);
       }
 
-      .main-content {
-        display: flex;
-        flex-wrap: wrap;
+      @keyframes blink {
+        50% {
+          opacity: 0.3;
+        }
       }
 
-      .video-section {
-        flex: 2;
-        min-width: 300px;
-        padding: clamp(20px, 4vw, 40px);
-        background: linear-gradient(180deg, #16213e 0%, #0f0f23 100%);
-        position: relative;
-      }
-
-      .videos {
+      /* ---------- Layout ---------- */
+      .layout {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: clamp(16px, 3vw, 24px);
-        margin-bottom: clamp(20px, 4vw, 30px);
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 16px;
+        flex: 1;
+        min-height: 0;
       }
 
-      .video-container {
+      .stage-col {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .stage {
         position: relative;
-        background: #0a0a0a;
-        border-radius: 12px;
+        background: #000;
+        border-radius: var(--radius);
         overflow: hidden;
-        aspect-ratio: 4/3;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        transition: all 0.3s ease;
-        border: 2px solid rgba(102, 126, 234, 0.2);
+        border: 1px solid var(--border);
+        aspect-ratio: 16 / 9;
+        max-height: calc(100dvh - 230px);
+        min-height: 260px;
+        width: 100%;
       }
 
-      .video-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-        border-color: rgba(102, 126, 234, 0.6);
-      }
-
-      video {
+      .stage video {
         width: 100%;
         height: 100%;
         object-fit: cover;
         display: block;
+        background: #000;
       }
 
       #localVideo {
         transform: scaleX(-1);
       }
 
-      .video-label {
+      .pip {
         position: absolute;
-        top: 12px;
-        left: 12px;
-        background: linear-gradient(
-          135deg,
-          rgba(102, 126, 234, 0.95),
-          rgba(118, 75, 162, 0.95)
-        );
-        color: white;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: clamp(0.85em, 2vw, 0.95em);
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(10px);
-        letter-spacing: 0.5px;
-      }
-
-      .controls {
-        display: flex;
-        gap: clamp(8px, 2vw, 12px);
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      button {
-        padding: clamp(10px, 2vw, 14px) clamp(20px, 4vw, 32px);
-        border: none;
-        border-radius: 25px;
-        font-size: clamp(0.9em, 2vw, 1.05em);
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        position: relative;
+        right: 14px;
+        bottom: 14px;
+        width: clamp(110px, 24%, 240px);
+        aspect-ratio: 4 / 3;
+        border-radius: 12px;
         overflow: hidden;
-        letter-spacing: 0.5px;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        background: var(--surface-2);
       }
 
-      button::before {
-        content: "";
+      .tag {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
+        left: 10px;
+        top: 10px;
+        padding: 4px 10px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        z-index: 2;
+      }
+
+      .pip .tag {
+        left: 6px;
+        top: 6px;
+        font-size: 0.65rem;
+        padding: 2px 8px;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 24px;
+        background: linear-gradient(160deg, #141829, #0b0d17);
+        color: var(--muted);
+        transition: opacity 0.25s ease;
+        z-index: 1;
+      }
+
+      .overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .overlay h2 {
+        color: var(--text);
+        font-size: clamp(1.05rem, 2.4vw, 1.5rem);
+        margin: 14px 0 6px;
+      }
+
+      .overlay p {
+        font-size: 0.92rem;
+        max-width: 38ch;
+        margin: 0 auto;
+      }
+
+      .spinner {
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
+        border: 4px solid rgba(255, 255, 255, 0.12);
+        border-top-color: var(--brand);
+        animation: spin 0.9s linear infinite;
+        margin: 0 auto;
+        display: none;
       }
 
-      button:active::before {
-        width: 300px;
-        height: 300px;
+      .overlay.searching .spinner {
+        display: block;
+      }
+      .overlay.searching .empty-icon {
+        display: none;
       }
 
-      button:hover:not(:disabled) {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      .empty-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto;
+        display: block;
+        opacity: 0.6;
+        fill: var(--muted);
       }
 
-      button:active:not(:disabled) {
-        transform: translateY(0) scale(0.98);
-      }
-
-      button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        transform: none;
-        filter: grayscale(70%);
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
-      }
-
-      .btn-danger {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-      }
-
-      .btn-danger:hover:not(:disabled) {
-        background: linear-gradient(135deg, #d775e0 0%, #e03e55 100%);
-      }
-
-      .btn-success {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-      }
-
-      .btn-success:hover:not(:disabled) {
-        background: linear-gradient(135deg, #3891e3 0%, #00d7e3 100%);
-      }
-
-      .chat-section {
-        flex: 1;
-        min-width: 300px;
-        display: flex;
-        flex-direction: column;
-        background: rgba(22, 22, 38, 0.9);
-      }
-
-      .chat-header {
-        padding: clamp(18px, 3vw, 24px);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-weight: 700;
-        font-size: clamp(1.1em, 2.5vw, 1.3em);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        letter-spacing: 0.5px;
-      }
-
-      .chat-messages {
-        flex: 1;
-        padding: clamp(16px, 3vw, 24px);
-        overflow-y: auto;
-        max-height: 550px;
-        min-height: 250px;
-        scroll-behavior: smooth;
-        background: rgba(15, 15, 35, 0.5);
-      }
-
-      .chat-messages::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .chat-messages::-webkit-scrollbar-track {
-        background: rgba(30, 30, 50, 0.5);
-        border-radius: 10px;
-      }
-
-      .chat-messages::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
-      }
-
-      .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #5568d3 0%, #653a8b 100%);
-      }
-
-      .message {
-        margin-bottom: 14px;
-        padding: 12px 16px;
-        border-radius: 16px;
-        max-width: 85%;
-        word-wrap: break-word;
-        animation: fadeIn 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        transition: transform 0.2s ease;
-      }
-
-      .message:hover {
-        transform: translateX(2px);
-      }
-
-      .message.sent {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        margin-left: auto;
-        text-align: right;
-        border-bottom-right-radius: 4px;
-      }
-
-      .message.received {
-        background: rgba(40, 40, 60, 0.8);
-        color: #e0e0e0;
-        border-bottom-left-radius: 4px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-      }
-
-      .message-time {
-        font-size: 0.75em;
-        opacity: 0.7;
-        margin-top: 6px;
-        font-weight: 500;
-      }
-
-      .chat-input {
-        display: flex;
-        padding: clamp(16px, 3vw, 24px);
-        gap: clamp(8px, 2vw, 12px);
-        border-top: 2px solid rgba(102, 126, 234, 0.2);
-        background: rgba(22, 22, 38, 0.95);
-        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .chat-input input {
-        flex: 1;
-        padding: clamp(12px, 2vw, 14px) clamp(16px, 3vw, 20px);
-        border: 2px solid rgba(102, 126, 234, 0.3);
-        border-radius: 25px;
-        font-size: clamp(0.9em, 2vw, 1em);
-        outline: none;
-        transition: all 0.3s ease;
-        background: rgba(30, 30, 50, 0.8);
-        color: #e0e0e0;
-      }
-
-      .chat-input input::placeholder {
-        color: rgba(224, 224, 224, 0.5);
-      }
-
-      .chat-input input:focus {
-        border-color: #667eea;
-        background: rgba(40, 40, 60, 0.9);
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
-      }
-
-      .chat-input button {
-        padding: clamp(12px, 2vw, 14px) clamp(20px, 4vw, 28px);
-      }
-
-      .info {
-        padding: clamp(18px, 3vw, 24px);
-        background: rgba(15, 15, 35, 0.9);
-        font-size: clamp(0.85em, 2vw, 0.95em);
-        border-top: 2px solid rgba(102, 126, 234, 0.2);
-      }
-
-      .info-item {
-        margin-bottom: 12px;
-        padding: 12px;
-        background: rgba(30, 30, 50, 0.6);
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-      }
-
-      .info-item:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        border-color: rgba(102, 126, 234, 0.4);
-      }
-
-      .info-item strong {
-        display: inline-block;
-        width: clamp(100px, 20vw, 120px);
-        color: #60a5fa;
-        font-weight: 700;
-      }
-
-      .info-item span {
-        color: #a0a0c0;
-      }
-
-      @media (max-width: 1024px) {
-        .videos {
-          grid-template-columns: 1fr;
-        }
-
-        .video-section {
-          min-width: 100%;
-        }
-
-        .main-content {
-          flex-direction: column;
-        }
-      }
-
-      @media (max-width: 768px) {
-        body {
-          padding: 10px;
-        }
-
-        .header {
-          padding: 25px 15px;
-        }
-
-        .video-section {
-          padding: 20px 15px;
-        }
-
-        .controls {
-          gap: 8px;
-        }
-
-        .controls button {
-          font-size: 0.9em;
-        }
-
-        .chat-section {
-          min-width: 100%;
-        }
-
-        .chat-messages {
-          min-height: 200px;
-          max-height: 400px;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .header h1 {
-          font-size: 1.8em;
-        }
-
-        .controls {
-          flex-direction: column;
-          width: 100%;
-        }
-
-        .controls button {
-          width: 100%;
-          padding: 12px 20px;
-        }
-
-        .video-label {
-          font-size: 0.8em;
-          padding: 5px 12px;
-        }
-      }
-
-      /* Loading animation */
-      @keyframes rotate {
-        from {
-          transform: rotate(0deg);
-        }
+      @keyframes spin {
         to {
           transform: rotate(360deg);
         }
       }
 
-      .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: rotate 1s linear infinite;
+      /* ---------- Controls ---------- */
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      button {
+        font: inherit;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        min-height: 48px;
+        padding: 10px 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: transform 0.12s ease, filter 0.15s ease, background 0.15s;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+
+      button svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        flex-shrink: 0;
+      }
+
+      button:hover:not(:disabled) {
+        filter: brightness(1.15);
+      }
+      button:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--brand), #5a8bff);
+        border-color: transparent;
+        color: #fff;
+      }
+      .btn-success {
+        background: linear-gradient(135deg, #1fb57a, #2fd18b);
+        border-color: transparent;
+        color: #04281a;
+      }
+      .btn-danger {
+        background: rgba(255, 92, 114, 0.14);
+        border-color: rgba(255, 92, 114, 0.4);
+        color: #ff8fa0;
+      }
+
+      .hint {
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      /* ---------- Chat ---------- */
+      .chat {
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .chat-header {
+        padding: 14px 16px;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .chat-header small {
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.75rem;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 160px;
+        overscroll-behavior: contain;
+      }
+
+      .chat-empty {
+        margin: auto;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+        padding: 16px;
+      }
+
+      .message {
+        max-width: 85%;
+        padding: 9px 12px;
+        border-radius: 14px;
+        font-size: 0.93rem;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        animation: pop 0.18s ease;
+      }
+
+      .message.sent {
+        align-self: flex-end;
+        background: linear-gradient(135deg, var(--brand), #5a8bff);
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.received {
+        align-self: flex-start;
+        background: var(--surface-2);
+        border-bottom-left-radius: 4px;
+      }
+
+      .message-time {
+        font-size: 0.68rem;
+        opacity: 0.65;
+        margin-top: 2px;
+        text-align: right;
+      }
+
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+      }
+
+      .chat-input {
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .chat-input input {
+        flex: 1;
+        min-width: 0;
+        font: inherit;
+        font-size: 16px; /* evita zoom automático no iOS */
+        color: var(--text);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0 14px;
+        min-height: 48px;
+      }
+
+      .chat-input input::placeholder {
+        color: var(--muted);
+      }
+      .chat-input input:disabled {
+        opacity: 0.5;
+      }
+
+      /* ---------- Info ---------- */
+      .info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        font-size: 0.75rem;
+        color: var(--muted);
+        justify-content: center;
+      }
+
+      .info b {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .info span.id {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      /* ---------- Toast ---------- */
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: calc(20px + env(safe-area-inset-bottom));
+        transform: translate(-50%, 30px);
+        background: var(--surface-2);
+        border: 1px solid rgba(255, 92, 114, 0.5);
+        color: var(--text);
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        max-width: min(92vw, 460px);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.25s ease;
+        z-index: 50;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      /* ---------- Tablet ---------- */
+      @media (max-width: 1024px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .stage {
+          max-height: 62dvh;
+        }
+        .chat {
+          height: 340px;
+        }
+        .controls {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      /* ---------- Celular ---------- */
+      @media (max-width: 600px) {
+        .app {
+          padding: 10px 12px 16px;
+          gap: 12px;
+        }
+        .brand p {
+          display: none;
+        }
+        .brand h1 {
+          font-size: 1.15rem;
+        }
+        .logo {
+          width: 34px;
+          height: 34px;
+        }
+        .status {
+          font-size: 0.78rem;
+          padding: 6px 10px;
+          max-width: 62%;
+        }
+        .stage {
+          aspect-ratio: 3 / 4;
+          max-height: 58dvh;
+          min-height: 0;
+        }
+        .pip {
+          width: 30%;
+          right: 10px;
+          bottom: 10px;
+        }
+        .controls {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .chat {
+          height: 300px;
+        }
+        .message {
+          max-width: 90%;
+        }
+      }
+
+      @media (max-width: 900px) and (orientation: landscape) {
+        .stage {
+          aspect-ratio: 16 / 9;
+          max-height: 70dvh;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <h1>🎥 Omiro</h1>
-        <p>Random Video Chat with Strangers</p>
-      </div>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path
+                d="M16 22a6 6 0 0 1 6-6h14a6 6 0 0 1 6 6v4l10-6v24l-10-6v4a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h1>Papeo</h1>
+            <p>Papo aleatório por vídeo</p>
+          </div>
+        </div>
+        <div class="status" id="status" role="status" aria-live="polite">
+          Desconectado
+        </div>
+      </header>
 
-      <div class="status" id="status">Disconnected</div>
-
-      <div class="main-content">
-        <div class="video-section">
-          <div class="videos">
-            <div class="video-container">
-              <video id="localVideo" autoplay muted playsinline></video>
-              <div class="video-label">You</div>
+      <main class="layout">
+        <section class="stage-col" aria-label="Videochamada">
+          <div class="stage">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="tag">Estranho(a)</div>
+            <div class="overlay" id="remoteOverlay">
+              <div>
+                <svg class="empty-icon" viewBox="0 0 64 64" aria-hidden="true">
+                  <path
+                    d="M16 22a6 6 0 0 1 6-6h14a6 6 0 0 1 6 6v4l10-6v24l-10-6v4a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6z"
+                  />
+                </svg>
+                <div class="spinner" aria-hidden="true"></div>
+                <h2 id="overlayTitle">Pronto para um papo?</h2>
+                <p id="overlayText">
+                  Conecte-se, ligue a câmera e encontre alguém para conversar.
+                </p>
+              </div>
             </div>
-            <div class="video-container">
-              <video id="remoteVideo" autoplay playsinline></video>
-              <div class="video-label">Stranger</div>
+            <div class="pip">
+              <video id="localVideo" autoplay muted playsinline></video>
+              <div class="tag">Você</div>
             </div>
           </div>
 
           <div class="controls">
             <button class="btn-primary" id="connectBtn" onclick="connect()">
-              Connect
+              Conectar
             </button>
             <button
               class="btn-success"
@@ -587,7 +665,7 @@
               onclick="startVideo()"
               disabled
             >
-              Start Video
+              Ligar câmera
             </button>
             <button
               class="btn-primary"
@@ -595,7 +673,7 @@
               onclick="findMatch()"
               disabled
             >
-              Find Match
+              Buscar par
             </button>
             <button
               class="btn-danger"
@@ -603,7 +681,7 @@
               onclick="nextPerson()"
               disabled
             >
-              Next Person
+              Próximo
             </button>
             <button
               class="btn-danger"
@@ -611,59 +689,53 @@
               onclick="disconnect()"
               disabled
             >
-              Disconnect
+              Sair
             </button>
           </div>
-        </div>
+          <p class="hint" id="hint">Passo 1: toque em <b>Conectar</b>.</p>
+        </section>
 
-        <div class="chat-section">
-          <div class="chat-header">Chat</div>
-          <div class="chat-messages" id="chatMessages">
-            <div style="text-align: center; color: #999; padding: 20px">
-              No messages yet. Find a match to start chatting!
-            </div>
+        <aside class="chat" aria-label="Chat">
+          <div class="chat-header">
+            Chat <small id="chatState">sem conversa</small>
           </div>
-          <div class="chat-input">
+          <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+          <form class="chat-input" id="chatForm" autocomplete="off">
             <input
               type="text"
               id="messageInput"
-              placeholder="Type a message..."
+              placeholder="Digite uma mensagem..."
+              maxlength="500"
               disabled
-              onkeypress="handleKeyPress(event)"
             />
-            <button
-              class="btn-primary"
-              id="sendBtn"
-              onclick="sendMessage()"
-              disabled
-            >
-              Send
+            <button class="btn-primary" id="sendBtn" type="submit" disabled>
+              Enviar
             </button>
-          </div>
-        </div>
-      </div>
+          </form>
+        </aside>
+      </main>
 
-      <div class="info">
-        <div class="info-item">
-          <strong>Client ID:</strong> <span id="clientId">-</span>
-        </div>
-        <div class="info-item">
-          <strong>Partner ID:</strong> <span id="partnerId">-</span>
-        </div>
-        <div class="info-item">
-          <strong>Status:</strong>
-          <span id="connectionStatus">Not connected</span>
-        </div>
-      </div>
+      <footer class="info">
+        <div>Seu ID: <span class="id" id="clientId">-</span></div>
+        <div>Par: <span class="id" id="partnerId">-</span></div>
+        <div>Conexão: <b id="connectionStatus">Desconectado</b></div>
+      </footer>
     </div>
 
+    <div class="toast" id="toast" role="alert"></div>
+
     <script>
+      const $ = (id) => document.getElementById(id);
+
       let ws = null;
       let localStream = null;
       let peerConnection = null;
       let clientId = null;
       let partnerId = null;
-      let isInitiator = false; // Track if this client should initiate the offer
+      let isInitiator = false;
+      let pendingCandidates = [];
+      let signalQueue = Promise.resolve(); // processa sinalização em ordem
+      let toastTimer = null;
 
       const config = {
         iceServers: [
@@ -688,273 +760,291 @@
         iceCandidatePoolSize: 10,
       };
 
+      /* ---------- UI helpers ---------- */
       function updateStatus(message, className = "") {
-        const statusEl = document.getElementById("status");
-        statusEl.textContent = message;
-        statusEl.className = "status " + className;
+        const el = $("status");
+        el.textContent = message;
+        el.className = "status " + className;
       }
 
       function updateInfo(field, value) {
-        document.getElementById(field).textContent = value || "-";
+        $(field).textContent = value || "-";
       }
 
-      async function getSessionToken() {
-        try {
-          const response = await fetch("/session/new");
-          if (!response.ok) {
-            throw new Error("Failed to get session token");
-          }
-          const data = await response.json();
-          return data.token;
-        } catch (error) {
-          console.error("Error fetching session token:", error);
-          throw error;
+      function shortId(id) {
+        return id ? id.slice(0, 8) : "-";
+      }
+
+      function showToast(message) {
+        const t = $("toast");
+        t.textContent = message;
+        t.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove("show"), 4500);
+      }
+
+      function setHint(html) {
+        $("hint").innerHTML = html;
+      }
+
+      function setOverlay(mode, title, text) {
+        const o = $("remoteOverlay");
+        o.classList.toggle("hidden", mode === "hidden");
+        o.classList.toggle("searching", mode === "searching");
+        if (title) $("overlayTitle").textContent = title;
+        if (text !== undefined) $("overlayText").textContent = text;
+      }
+
+      function setChatEnabled(on) {
+        $("messageInput").disabled = !on;
+        $("sendBtn").disabled = !on;
+        $("chatState").textContent = on ? "conversando" : "sem conversa";
+        if (on && window.matchMedia("(hover: hover)").matches) {
+          $("messageInput").focus();
         }
       }
 
+      /* ---------- Conexão ---------- */
+      async function getSessionToken() {
+        const response = await fetch("/session/new");
+        if (!response.ok) throw new Error("Falha ao obter sessão");
+        return (await response.json()).token;
+      }
+
       async function connect() {
+        if (ws) return;
+        $("connectBtn").disabled = true;
         try {
-          // Get session token first
-          updateStatus("Getting session token...", "");
+          updateStatus("Conectando...", "matching");
           const token = await getSessionToken();
-          console.log("Session token received:", token);
+          const proto = location.protocol === "https:" ? "wss" : "ws";
+          const socket = new WebSocket(
+            `${proto}://${location.host}/ws?token=${encodeURIComponent(token)}`
+          );
+          ws = socket;
 
-          const wsUrl = `/ws?token=${encodeURIComponent(token)}`;
-
-          ws = new WebSocket(wsUrl);
-
-          ws.onopen = () => {
-            console.log("WebSocket connected");
-            updateStatus("Connected to server", "connected");
-            updateInfo("connectionStatus", "Connected");
-
-            document.getElementById("connectBtn").disabled = true;
-            document.getElementById("startBtn").disabled = false;
-            document.getElementById("disconnectBtn").disabled = false;
+          socket.onopen = () => {
+            updateStatus("Conectado ao servidor", "connected");
+            updateInfo("connectionStatus", "Conectado");
+            $("startBtn").disabled = !!localStream;
+            $("findBtn").disabled = !localStream;
+            $("disconnectBtn").disabled = false;
+            setHint(
+              localStream
+                ? "Passo 3: toque em <b>Buscar par</b>."
+                : "Passo 2: toque em <b>Ligar câmera</b>."
+            );
           };
 
-          ws.onmessage = (event) => {
-            console.log("Received:", event.data);
-            const msg = JSON.parse(event.data);
-            handleMessage(msg);
+          socket.onmessage = (event) => {
+            let msg;
+            try {
+              msg = JSON.parse(event.data);
+            } catch (e) {
+              return;
+            }
+            // Sinalização WebRTC é processada em ordem, uma por vez
+            signalQueue = signalQueue
+              .then(() => handleMessage(msg))
+              .catch((err) => console.error("Erro ao tratar mensagem:", err));
           };
 
-          ws.onclose = () => {
-            console.log("WebSocket disconnected");
-            updateStatus("Disconnected", "");
-            updateInfo("connectionStatus", "Disconnected");
+          socket.onclose = () => {
+            if (ws !== socket) return; // já tratado por disconnect()
+            ws = null;
+            closePeer();
+            updateInfo("connectionStatus", "Desconectado");
             resetUI();
+            updateStatus("Conexão perdida", "error");
+            showToast("A conexão com o servidor foi encerrada.");
           };
 
-          ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            updateStatus("Connection error", "");
+          socket.onerror = () => {
+            if (ws === socket && socket.readyState !== WebSocket.OPEN) {
+              ws = null;
+              resetUI();
+              updateStatus("Erro de conexão", "error");
+              showToast("Não foi possível conectar ao servidor.");
+            }
           };
         } catch (error) {
-          console.error("Failed to connect:", error);
-          updateStatus("Failed to get session token", "");
-          alert("Failed to connect. Please try again.");
+          console.error("Falha ao conectar:", error);
+          ws = null;
+          updateStatus("Falha ao conectar", "error");
+          showToast("Não foi possível conectar. Tente novamente.");
+          $("connectBtn").disabled = false;
         }
       }
 
       async function startVideo() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showToast("Seu navegador não permite acesso à câmera (requer HTTPS).");
+          return;
+        }
+        $("startBtn").disabled = true;
         try {
           localStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
+            video: { facingMode: "user" },
             audio: true,
           });
-          document.getElementById("localVideo").srcObject = localStream;
-
-          updateStatus("Video started - Ready to find a match", "connected");
-          document.getElementById("startBtn").disabled = true;
-          document.getElementById("findBtn").disabled = false;
+          $("localVideo").srcObject = localStream;
+          updateStatus("Câmera ligada — pronto para buscar", "connected");
+          $("findBtn").disabled = false;
+          setHint("Passo 3: toque em <b>Buscar par</b>.");
         } catch (error) {
-          console.error("Error accessing media devices:", error);
-          alert(
-            "Could not access camera/microphone. Please check permissions."
+          console.error("Erro ao acessar mídia:", error);
+          $("startBtn").disabled = false;
+          const denied = error && error.name === "NotAllowedError";
+          showToast(
+            denied
+              ? "Permissão de câmera/microfone negada. Libere nas configurações do navegador."
+              : "Não foi possível acessar câmera/microfone."
           );
         }
       }
 
       function findMatch() {
         if (!ws || ws.readyState !== WebSocket.OPEN) {
-          alert("Not connected to server");
+          showToast("Você não está conectado ao servidor.");
           return;
         }
-
         send({ op: "join_queue" });
-        updateStatus("Finding a match...", "matching");
-        document.getElementById("findBtn").disabled = true;
+        updateStatus("Procurando alguém...", "matching");
+        setOverlay(
+          "searching",
+          "Procurando alguém...",
+          "Isso pode levar alguns instantes. Fique por aqui!"
+        );
+        setHint("Aguardando outra pessoa entrar na fila.");
+        $("findBtn").disabled = true;
       }
 
       function nextPerson() {
-        console.log("Looking for next person...");
-
-        if (peerConnection) {
-          peerConnection.close();
-          peerConnection = null;
-        }
-
-        const remoteVideo = document.getElementById("remoteVideo");
-        remoteVideo.srcObject = null;
-
-        // Send "next" command (NOT disconnect - we stay connected)
+        closePeer();
+        $("remoteVideo").srcObject = null;
         send({ op: "next" });
-
-        // Clear partner info
         partnerId = null;
         isInitiator = false;
         updateInfo("partnerId", "-");
-
-        // Clear chat
         clearChat();
-
-        // Update status
-        updateStatus("Looking for next person...", "matching");
-
-        // Disable controls temporarily
-        document.getElementById("nextBtn").disabled = true;
-        document.getElementById("messageInput").disabled = true;
-        document.getElementById("sendBtn").disabled = true;
-
-        // Automatically find next match
-        setTimeout(() => {
-          findMatch();
-        }, 500);
+        setChatEnabled(false);
+        $("nextBtn").disabled = true;
+        updateStatus("Procurando a próxima pessoa...", "matching");
+        setOverlay("searching", "Procurando a próxima pessoa...", "");
+        setTimeout(findMatch, 400);
       }
 
       function disconnect() {
-        if (localStream) {
-          localStream.getTracks().forEach((track) => track.stop());
-          localStream = null;
-        }
+        const socket = ws;
+        ws = null;
+        closePeer();
+        if (socket) socket.close();
+        resetUI();
+        updateStatus("Desconectado", "");
+        updateInfo("connectionStatus", "Desconectado");
+      }
 
+      function closePeer() {
         if (peerConnection) {
+          peerConnection.onicecandidate = null;
+          peerConnection.ontrack = null;
+          peerConnection.onconnectionstatechange = null;
           peerConnection.close();
           peerConnection = null;
         }
-
-        if (ws) {
-          ws.close();
-          ws = null;
-        }
-
-        resetUI();
+        pendingCandidates = [];
       }
 
       function resetUI() {
-        document.getElementById("connectBtn").disabled = false;
-        document.getElementById("startBtn").disabled = true;
-        document.getElementById("findBtn").disabled = true;
-        document.getElementById("nextBtn").disabled = true;
-        document.getElementById("disconnectBtn").disabled = true;
-        document.getElementById("messageInput").disabled = true;
-        document.getElementById("sendBtn").disabled = true;
-
-        document.getElementById("localVideo").srcObject = null;
-        document.getElementById("remoteVideo").srcObject = null;
-
+        $("connectBtn").disabled = false;
+        $("startBtn").disabled = true;
+        $("findBtn").disabled = true;
+        $("nextBtn").disabled = true;
+        $("disconnectBtn").disabled = true;
+        setChatEnabled(false);
+        $("localVideo").srcObject = null;
+        $("remoteVideo").srcObject = null;
+        if (localStream) {
+          localStream.getTracks().forEach((t) => t.stop());
+          localStream = null;
+        }
         clientId = null;
         partnerId = null;
+        isInitiator = false;
         updateInfo("clientId", "-");
         updateInfo("partnerId", "-");
         clearChat();
+        setOverlay(
+          "idle",
+          "Pronto para um papo?",
+          "Conecte-se, ligue a câmera e encontre alguém para conversar."
+        );
+        setHint("Passo 1: toque em <b>Conectar</b>.");
       }
 
-      function handleMessage(msg) {
+      /* ---------- Mensagens do servidor ---------- */
+      async function handleMessage(msg) {
         switch (msg.op) {
           case "match_found":
-            handleMatchFound(msg);
-            break;
+            return handleMatchFound(msg);
           case "webrtc_offer":
-            handleWebRTCOffer(msg);
-            break;
+            return handleWebRTCOffer(msg);
           case "webrtc_answer":
-            handleWebRTCAnswer(msg);
-            break;
+            return handleWebRTCAnswer(msg);
           case "ice_candidate":
-            handleICECandidate(msg);
-            break;
+            return handleICECandidate(msg);
           case "chat":
-            handleChatMessage(msg);
-            break;
+            return addMessage(msg.message, "received");
           case "partner_disconnected":
-            handlePartnerDisconnect();
-            break;
+            return handlePartnerDisconnect();
           default:
             if (msg.client_id) {
               clientId = msg.client_id;
-              updateInfo("clientId", clientId);
-            }
-            if (msg.message) {
-              console.log("Server message:", msg.message);
+              updateInfo("clientId", shortId(clientId));
             }
         }
       }
 
       async function handleMatchFound(msg) {
-        console.log("Match found:", msg.partner);
+        closePeer();
         partnerId = msg.partner;
-        updateInfo("partnerId", partnerId);
-        updateStatus("Match found! Connecting...", "matched");
+        updateInfo("partnerId", shortId(partnerId));
+        updateStatus("Par encontrado! Conectando...", "matched");
+        setOverlay("searching", "Par encontrado!", "Estabelecendo conexão...");
+        setHint("Dica: seja gentil e divirta-se!");
 
-        document.getElementById("nextBtn").disabled = false;
-        document.getElementById("messageInput").disabled = false;
-        document.getElementById("sendBtn").disabled = false;
+        $("nextBtn").disabled = false;
+        setChatEnabled(true);
+        clearChat(true);
 
-        // Determine who initiates based on who should call
-        // The server tells us if we should be the caller
-        isInitiator =
-          msg.should_call === true || clientId.localeCompare(partnerId) < 0;
-
-        console.log(`Client ID: ${clientId}`);
-        console.log(`Partner ID: ${partnerId}`);
-        console.log(`Comparison result: ${clientId.localeCompare(partnerId)}`);
-        console.log(`Is initiator: ${isInitiator}`);
+        isInitiator = msg.should_call === true;
 
         if (isInitiator) {
-          // CALLER: Create peer connection and offer immediately
-          console.log("=== I am the CALLER ===");
           await createPeerConnection();
-
           const offer = await peerConnection.createOffer();
           await peerConnection.setLocalDescription(offer);
-          console.log("Created offer, state:", peerConnection.signalingState);
-
-          send({
-            op: "webrtc_offer",
-            data: {
-              sdp: offer.sdp,
-            },
-          });
-        } else {
-          // CALLEE: Do NOT create peer connection yet - wait for offer
-          console.log("=== I am the CALLEE - waiting for offer ===");
+          send({ op: "webrtc_offer", data: { sdp: offer.sdp } });
         }
       }
 
       async function createPeerConnection() {
-        peerConnection = new RTCPeerConnection(config);
+        const pc = new RTCPeerConnection(config);
+        peerConnection = pc;
 
-        // Add local stream tracks
         if (localStream) {
-          localStream.getTracks().forEach((track) => {
-            peerConnection.addTrack(track, localStream);
-          });
+          localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
         }
 
-        // Handle incoming tracks
-        peerConnection.ontrack = (event) => {
-          console.log("Received remote track");
-          const remoteVideo = document.getElementById("remoteVideo");
+        pc.ontrack = (event) => {
+          const remoteVideo = $("remoteVideo");
           if (remoteVideo.srcObject !== event.streams[0]) {
             remoteVideo.srcObject = event.streams[0];
-            updateStatus("Connected! You can now video chat", "matched");
+            setOverlay("hidden");
+            updateStatus("Conectado! Bom papo", "matched");
           }
         };
 
-        // Handle ICE candidates
-        peerConnection.onicecandidate = (event) => {
+        pc.onicecandidate = (event) => {
           if (event.candidate) {
             send({
               op: "ice_candidate",
@@ -969,204 +1059,144 @@
           }
         };
 
-        // Handle connection state
-        peerConnection.onconnectionstatechange = () => {
-          console.log("Connection state:", peerConnection.connectionState);
+        pc.onconnectionstatechange = () => {
+          if (pc !== peerConnection) return;
+          if (pc.connectionState === "failed") {
+            showToast("A conexão de vídeo falhou. Tentando outro par...");
+            nextPerson();
+          } else if (pc.connectionState === "disconnected") {
+            updateStatus("Conexão instável...", "matching");
+          }
         };
       }
 
+      async function flushCandidates() {
+        const list = pendingCandidates;
+        pendingCandidates = [];
+        for (const c of list) {
+          try {
+            await peerConnection.addIceCandidate(c);
+          } catch (e) {
+            console.warn("Candidato ICE ignorado:", e);
+          }
+        }
+      }
+
       async function handleWebRTCOffer(msg) {
-        console.log("=== Received WebRTC offer ===", msg);
-
-        // Only the CALLEE should receive offers
-        if (isInitiator) {
-          console.error("❌ I am the CALLER - should not receive offer!");
-          return;
-        }
-
-        // CALLEE: Create peer connection NOW (when receiving offer)
-        if (!peerConnection) {
-          console.log("Creating peer connection as CALLEE");
-          await createPeerConnection();
-        }
-
-        console.log(
-          "Setting remote offer, current state:",
-          peerConnection.signalingState
-        );
-        await peerConnection.setRemoteDescription(
-          new RTCSessionDescription({
-            type: "offer",
-            sdp: msg.data.sdp,
-          })
-        );
-        console.log("Remote offer set, state:", peerConnection.signalingState);
-
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        console.log(
-          "Local answer created, state:",
-          peerConnection.signalingState
-        );
-
-        send({
-          op: "webrtc_answer",
-          data: {
-            sdp: answer.sdp,
-          },
-        });
-        console.log("✅ Answer sent to CALLER");
+        if (isInitiator) return;
+        if (!peerConnection) await createPeerConnection();
+        const pc = peerConnection;
+        await pc.setRemoteDescription({ type: "offer", sdp: msg.data.sdp });
+        await flushCandidates();
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        send({ op: "webrtc_answer", data: { sdp: answer.sdp } });
       }
 
       async function handleWebRTCAnswer(msg) {
-        console.log("=== Received WebRTC answer ===", msg);
-
-        // Only the CALLER should receive answers
-        if (!isInitiator) {
-          console.error("❌ I am the CALLEE - should not receive answer!");
-          return;
-        }
-
-        if (!peerConnection) {
-          console.error("❌ No peer connection exists!");
-          return;
-        }
-
-        // CRITICAL: Answer is only valid if we created an offer
-        const state = peerConnection.signalingState;
-        console.log("Current signaling state:", state);
-
-        if (state !== "have-local-offer") {
-          console.error(`❌ Cannot set remote answer in state: ${state}`);
-          return;
-        }
-
-        await peerConnection.setRemoteDescription(
-          new RTCSessionDescription({
-            type: "answer",
-            sdp: msg.data.sdp,
-          })
-        );
-        console.log(
-          "✅ Remote answer set, state:",
-          peerConnection.signalingState
-        );
+        if (!isInitiator || !peerConnection) return;
+        if (peerConnection.signalingState !== "have-local-offer") return;
+        await peerConnection.setRemoteDescription({
+          type: "answer",
+          sdp: msg.data.sdp,
+        });
+        await flushCandidates();
       }
 
       async function handleICECandidate(msg) {
-        console.log("Received ICE candidate", msg);
-        if (peerConnection && msg.data.candidate) {
-          const candidate = msg.data.candidate;
-          await peerConnection.addIceCandidate(
-            new RTCIceCandidate({
-              candidate: candidate.candidate,
-              sdpMLineIndex: candidate.sdpMLineIndex,
-              sdpMid: candidate.sdpMid,
-            })
-          );
+        const c = msg.data && msg.data.candidate;
+        if (!c) return;
+        const candidate = {
+          candidate: c.candidate,
+          sdpMLineIndex: c.sdpMLineIndex,
+          sdpMid: c.sdpMid,
+        };
+        // Candidatos que chegam antes da descrição remota ficam em buffer
+        if (!peerConnection || !peerConnection.remoteDescription) {
+          pendingCandidates.push(candidate);
+          return;
         }
-      }
-
-      function handleChatMessage(msg) {
-        addMessage(msg.message, "received");
+        try {
+          await peerConnection.addIceCandidate(candidate);
+        } catch (e) {
+          console.warn("Candidato ICE ignorado:", e);
+        }
       }
 
       function handlePartnerDisconnect() {
-        console.log("Partner disconnected");
-        updateStatus("Partner disconnected - Finding new match...", "matching");
-
-        // Clean up peer connection
-        if (peerConnection) {
-          peerConnection.close();
-          peerConnection = null;
-        }
-
-        // Clear remote video
-        document.getElementById("remoteVideo").srcObject = null;
-
-        // Clear partner info
+        closePeer();
+        $("remoteVideo").srcObject = null;
         partnerId = null;
         isInitiator = false;
         updateInfo("partnerId", "-");
-
-        // Clear chat
         clearChat();
+        setChatEnabled(false);
+        $("nextBtn").disabled = true;
+        updateStatus("O par saiu — buscando outro...", "matching");
+        setOverlay("searching", "O par saiu", "Buscando outra pessoa...");
 
-        // Disable chat controls
-        document.getElementById("messageInput").disabled = true;
-        document.getElementById("sendBtn").disabled = true;
-        document.getElementById("nextBtn").disabled = true;
-
-        // Automatically rejoin the queue
         setTimeout(() => {
           if (ws && ws.readyState === WebSocket.OPEN && localStream) {
-            console.log("Automatically rejoining queue...");
             findMatch();
+          } else {
+            setOverlay("idle", "O par saiu", "Ligue a câmera e busque de novo.");
           }
-        }, 1000);
+        }, 800);
       }
 
+      /* ---------- Chat ---------- */
+      $("chatForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendMessage();
+      });
+
       function sendMessage() {
-        const input = document.getElementById("messageInput");
+        const input = $("messageInput");
         const message = input.value.trim();
-
-        if (!message) return;
-
-        send({
-          op: "chat",
-          data: {
-            message: message,
-          },
-        });
-
+        if (!message || input.disabled) return;
+        send({ op: "chat", data: { message } });
         addMessage(message, "sent");
         input.value = "";
       }
 
-      function handleKeyPress(event) {
-        if (event.key === "Enter") {
-          sendMessage();
-        }
-      }
-
       function addMessage(text, type) {
-        const messagesDiv = document.getElementById("chatMessages");
+        const box = $("chatMessages");
+        const empty = box.querySelector(".chat-empty");
+        if (empty) empty.remove();
 
-        if (messagesDiv.querySelector('[style*="text-align: center"]')) {
-          messagesDiv.innerHTML = "";
-        }
-
-        const messageDiv = document.createElement("div");
-        messageDiv.className = "message " + type;
-
-        const textDiv = document.createElement("div");
-        textDiv.textContent = text;
-
-        const timeDiv = document.createElement("div");
-        timeDiv.className = "message-time";
-        timeDiv.textContent = new Date().toLocaleTimeString();
-
-        messageDiv.appendChild(textDiv);
-        messageDiv.appendChild(timeDiv);
-        messagesDiv.appendChild(messageDiv);
-
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        const div = document.createElement("div");
+        div.className = "message " + type;
+        const body = document.createElement("div");
+        body.textContent = text;
+        const time = document.createElement("div");
+        time.className = "message-time";
+        time.textContent = new Date().toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        div.append(body, time);
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
       }
 
-      function clearChat() {
-        const messagesDiv = document.getElementById("chatMessages");
-        messagesDiv.innerHTML =
-          '<div style="text-align: center; color: #999; padding: 20px;">No messages yet. Find a match to start chatting!</div>';
+      function clearChat(matched = false) {
+        const box = $("chatMessages");
+        box.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "chat-empty";
+        empty.textContent = matched
+          ? "Diga olá! 👋"
+          : "Encontre um par para começar a conversar.";
+        box.appendChild(empty);
       }
 
       function send(data) {
         if (ws && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(data));
-          console.log("Sent:", data);
-        } else {
-          console.error("WebSocket not connected");
         }
       }
+
+      clearChat();
     </script>
   </body>
 </html>

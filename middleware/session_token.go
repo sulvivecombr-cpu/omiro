@@ -2,10 +2,12 @@ package middleware
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +15,20 @@ import (
 	"github.com/google/uuid"
 )
 
-var tokenSecret = []byte("replace-with-env-secret")
+// SESSION_SECRET should be set in production; otherwise a random per-process
+// secret is generated (tokens then become invalid after a restart).
+var tokenSecret = loadSecret()
+
+func loadSecret() []byte {
+	if s := os.Getenv("SESSION_SECRET"); s != "" {
+		return []byte(s)
+	}
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	return b
+}
 
 func GenerateSessionToken() (string, int64, error) {
 	sid := uuid.NewString()
